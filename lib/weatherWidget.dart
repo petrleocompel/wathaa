@@ -20,7 +20,7 @@ class TodayWeatherWidget extends StatelessWidget {
         Column(
           children: [
             Text(this.weather.temperature!.celsius!.toStringAsFixed(1) + "° C",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+                style: Theme.of(context).textTheme.headline4),
             Image.network("https://openweathermap.org/img/wn/" +
                 this.weather.weatherIcon! +
                 "@4x.png"),
@@ -28,10 +28,10 @@ class TodayWeatherWidget extends StatelessWidget {
         ),
         Column(children: [
           Text(weekDay(this.weather.date!.weekday).capitalize(),
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+              style: Theme.of(context).textTheme.headline5),
           Text(this.weather.areaName!.capitalize()),
           Text(this.weather.weatherDescription!.capitalize(),
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+              style: Theme.of(context).textTheme.headline5),
         ]),
       ],
     ));
@@ -47,10 +47,10 @@ class WeatherWidget extends StatelessWidget {
     return Center(
       child: Column(children: [
         Text(this.weather.temperature!.celsius!.toStringAsFixed(1) + "° C",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            style: Theme.of(context).textTheme.headline6),
         Text(this.weather.weatherDescription!.capitalize()),
         Text(weekDay(this.weather.date!.weekday).capitalize(),
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            style: Theme.of(context).textTheme.subtitle2),
         Image.network("https://openweathermap.org/img/wn/" +
             this.weather.weatherIcon! +
             "@2x.png")

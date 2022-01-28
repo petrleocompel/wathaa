@@ -11,6 +11,7 @@
 
 # ENV
 assets/.env
+.env
 
 # IntelliJ related
 *.iml

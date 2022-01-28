@@ -16,6 +16,7 @@ dependencies:
   weather: ^2.0.1
   flutter_dotenv: ^5.0.0
   supercharged: ^2.0.0
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
@@ -25,3 +26,6 @@ flutter:
   uses-material-design: true
   assets:
     - .env
+
+assets:
+  - .env

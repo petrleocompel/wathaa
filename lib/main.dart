@@ -1,13 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:wathaa/weatherWidget.dart';
 import 'package:weather/weather.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supercharged/supercharged.dart';
+import 'package:flutter/services.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+
   runApp(MyApp());
 }
 
@@ -21,7 +25,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool dark = true;
+  bool dark = false;
 
   void _toggleTheme() {
     setState(() {
@@ -33,7 +37,14 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Wathaa',
-      theme: this.dark ? ThemeData.dark() : ThemeData.light(),
+      theme: this.dark
+          ? ThemeData.dark()
+          : ThemeData.light().copyWith(
+              backgroundColor: Colors.blue,
+              textTheme: ThemeData.light().textTheme.apply(
+                    bodyColor: Colors.white,
+                    displayColor: Colors.white,
+                  )),
       home: MyHomePage(themeToggle: this._toggleTheme),
     );
   }
@@ -81,12 +92,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Color? themeColor = Theme.of(context).textTheme.bodyText1!.color;
     return Scaffold(
+      backgroundColor: Colors.blue,
       appBar: AppBar(
+        toolbarTextStyle: TextStyle(color: themeColor),
+        actionsIconTheme: Theme.of(context).iconTheme,
         elevation: 0,
         backgroundColor: Colors.transparent,
         actions: [
-          Center(child: Text(this.refreshDate.toLocal().toString())),
+          Center(
+              child: Text(
+            DateFormat.Hms().format(this.refreshDate.toLocal()),
+          )),
           IconButton(
             onPressed: this.refreshWeather,
             tooltip: 'Refresh',
@@ -98,45 +116,37 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () => this.themeToggle())
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              child: FutureBuilder<List<Weather>>(
-                key: Key(this.refreshDate.toString()),
-                future: updateWeather(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Weather>> snapshot) {
-                  if (snapshot.hasError) {
-                    return Text("Chyba načtení");
-                  } else if (snapshot.hasData) {
-                    return Column(
+      body: Container(
+        child: FutureBuilder<List<Weather>>(
+          key: Key(this.refreshDate.toString()),
+          future: updateWeather(),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<Weather>> snapshot) {
+            if (snapshot.hasError) {
+              return Text("Chyba načtení");
+            } else if (snapshot.hasData) {
+              return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TodayWeatherWidget(snapshot.data!.first),
+                    Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          TodayWeatherWidget(snapshot.data!.first),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: IterableSC(snapshot.data!)
-                                  .withoutFirst()
-                                  .groupBy((element) =>
-                                      element.date!.day.toString() +
-                                      "-" +
-                                      element.date!.month.toString() +
-                                      "-" +
-                                      element.date!.year.toString())
-                                  .map((key, value) =>
-                                      MapEntry(key, value.first))
-                                  .values
-                                  .map((weather) => WeatherWidget(weather))
-                                  .toList())
-                        ]);
-                  }
-                  return Center(child: CircularProgressIndicator());
-                },
-              ),
-            ),
-          ],
+                        children: IterableSC(snapshot.data!)
+                            .withoutFirst()
+                            .groupBy((element) =>
+                                element.date!.day.toString() +
+                                "-" +
+                                element.date!.month.toString() +
+                                "-" +
+                                element.date!.year.toString())
+                            .map((key, value) => MapEntry(key, value.first))
+                            .values
+                            .map((weather) => WeatherWidget(weather))
+                            .toList())
+                  ]);
+            }
+            return Center(child: CircularProgressIndicator());
+          },
         ),
       ),
     );
