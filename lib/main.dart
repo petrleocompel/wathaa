@@ -123,7 +123,12 @@ class _MyHomePageState extends State<MyHomePage> {
           builder:
               (BuildContext context, AsyncSnapshot<List<Weather>> snapshot) {
             if (snapshot.hasError) {
-              return Text("Chyba načtení");
+              return Column(
+                children: [
+                  Text("Chyba načtení"),
+                  Text(snapshot.error.toString())
+                ],
+              );
             } else if (snapshot.hasData) {
               return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
